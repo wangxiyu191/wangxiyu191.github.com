@@ -193,7 +193,17 @@ main article img{
 		margin: 0px;
 	}
 	li a{
-		font-size: 20px;
-		margin: 4px;
+		font-size: 15px;
+		margin: 8px;
+	}
+	#logo{
+		width: 40px;
+		height: 40px;
+		margin-top: 10px;
+	}
+	#float .name{
+		margin-top: 25px;
+		font-size: 15px;
+		opacity: 1.0;
 	}
 }

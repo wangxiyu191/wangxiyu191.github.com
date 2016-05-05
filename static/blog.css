@@ -129,9 +129,9 @@ main article img{
 	#right{
 		text-align: center;
 		display:-webkit-flex;
-	display:-moz-flex;
-	display:flex;
-	display:-ms-flexbox;
+		display:-moz-flex;
+		display:flex;
+		display:-ms-flexbox;
 		flex-flow: row;
 		width:100%;
 		margin: 5px;
@@ -140,9 +140,9 @@ main article img{
 		margin-left: auto; margin-right: auto;
 		text-align: center;
 		display:-webkit-flex;
-	display:-moz-flex;
-	display:flex;
-	display:-ms-flexbox;
+		display:-moz-flex;
+		display:flex;
+		display:-ms-flexbox;
 		flex-flow: row;
 		position: static;
 	}

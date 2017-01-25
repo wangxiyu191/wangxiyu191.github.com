@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0">
+  <channel>
+    <title>Wxy&#39;s Blog</title>
+    <link>http://blog.wangxiyu.me/</link>
+    <description>Reversing,Web Backend</description>
+    <managingEditor>wangxiyu191@gmail.com (Wxy)</managingEditor>
+    <pubDate>Wed, 25 Jan 2017 12:08:50 +0800</pubDate>
+    <item>
+      <title>reversing.kr AutoHotkey2&#xA;</title>
+      <link>/articles/reversing_kr_autohotkey2.html</link>
+      <description></description>
+      <author>Wxy</author>
+      <guid>reversing_kr_autohotkey2</guid>
+      <pubDate>Mon, 15 Feb 2016 22:30:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>Wechall SQLI&#xA;</title>
+      <link>/articles/wechall_sql.html</link>
+      <description></description>
+      <author>Wxy</author>
+      <guid>wechall_sql</guid>
+      <pubDate>Mon, 09 Nov 2015 12:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>Hello Blogo&#xA;</title>
+      <link>/articles/hello_blogo.html</link>
+      <description></description>
+      <author>Wxy</author>
+      <guid>hello_blogo</guid>
+      <pubDate>Sat, 10 Oct 2015 09:42:00 +0800</pubDate>
+    </item>
+  </channel>
+</rss>

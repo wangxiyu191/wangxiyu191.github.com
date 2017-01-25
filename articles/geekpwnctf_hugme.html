@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>GeekPwnCTF2016 qual HugMe-300
+</title>
+		<link rel="stylesheet" href="/static/init.css" type="text/css">
+		<link rel="stylesheet" href="/static/yue.css" type="text/css">
+		<link rel="stylesheet" href="/static/blog.css" type="text/css">
+		<link rel="alternate" href="/rss.xml" type="application/rss+xml"/>
+		<link rel="alternate" href="/atom.xml" type="application/atom+xml"/>
+	</head>
+	<body>
+		<div id="page">
+			<main class="yue">
+			<article>
+				<h1 class="title"><a href="/articles/geekpwnctf_hugme.html">GeekPwnCTF2016 qual HugMe-300
+</a></h1>
+				<aside class="time">
+					Posted at
+					<time>2016-09-25 12:26:00</time>
+				</aside>
+				<section class="post-content">
+					<p>一个加了壳的swf(后来知道是doswf的壳)</p>
+
+<p>先preload挂个TheMiner，然后看loader的内容，脱去第一层壳。</p>
+
+<p><img src="/static/hugme/14747777552556.jpg" alt="" /></p>
+
+<p>反编译取出的swf，发现一个坑<br />
+<img src="/static/hugme/14747780161994.jpg" alt="" /><br />
+显示出来的hugme啥用都没有。。。需要点击的那个hugme又没被正确加载。。需要自己做修改<br />
+然后才能看见真正的按钮<br />
+<img src="/static/hugme/14747781328451.jpg" alt="" /></p>
+
+<p>接着关键的判断逻辑。<br />
+<img src="/static/hugme/14747778722896.jpg" alt="" /><br />
+然而Verify运行时才载入。。<br />
+<img src="/static/hugme/14747782423072.jpg" alt="" /><br />
+于是再次脱壳。。。TheMiner没hook loadBytes,所以这里只能自己来<br />
+提取出这个函数运行然后把uncompress的结果base64一下，trace打出来。<br />
+然后再用python保存成文件。(不会actionscript的文件读写只好这么搞)</p>
+
+<p>然后反编译保存下来的文件，发现校验过程其实就是个方程组<br />
+<img src="/static/hugme/14747785230624.jpg" alt="" /><br />
+method3没用。。只要符合method2里的方程组，method3一定符合。</p>
+
+<p>然后就是求解方程组得到一组解[14,0,1,14,14,14,13,0,9,3,12,11,2,2,11]<br />
+对应的flag e01eeed093cb22b<br />
+然而这才15位 。。根据readme的提示，枚举最后一位。。发现e01eeed093cb22bb是hello world的md5</p>
+
+<p>故flag为e01eeed093cb22bb</p>
+
+				</section>
+			</article>
+			<div id="disqus_thread"></div>
+			
+			<div class="ds-thread" data-thread-key="geekpwnctf_hugme" data-title="GeekPwnCTF2016 qual HugMe-300
+" data-url="/articles/geekpwnctf_hugme.html"></div>
+			
+			
+			<script type="text/javascript">
+			var duoshuoQuery = {short_name:"wxyblog"};
+				(function() {
+					var ds = document.createElement('script');
+					ds.type = 'text/javascript';ds.async = true;
+					ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+					ds.charset = 'UTF-8';
+					(document.getElementsByTagName('head')[0]
+					|| document.getElementsByTagName('body')[0]).appendChild(ds);
+				})();
+			</script>
+			
+			</main>
+			<div id="right">
+				<div id="float">
+					<img id="logo" src="/static/logo.jpg">
+					<p class="name">Wxy's</p>
+					</img>
+					
+					<nav>
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/archive.html">Archives</a></li>
+							<li><a href="/links.html">Links</a></li>
+							<li><a href="/about.html">About</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+		<footer id="footer">
+			Powered by Blogo
+		</footer>
+		<link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.0.0/styles/default.min.css">
+		<script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+	</body>
+</html>

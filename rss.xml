@@ -4,7 +4,15 @@
     <link>http://blog.wangxiyu.me/</link>
     <description>Reversing,Web Backend</description>
     <managingEditor>wangxiyu191@gmail.com (Wxy)</managingEditor>
-    <pubDate>Wed, 25 Jan 2017 12:08:50 +0800</pubDate>
+    <pubDate>Wed, 25 Jan 2017 12:24:35 +0800</pubDate>
+    <item>
+      <title>GeekPwnCTF2016 qual HugMe-300&#xA;</title>
+      <link>/articles/geekpwnctf_hugme.html</link>
+      <description></description>
+      <author>Wxy</author>
+      <guid>geekpwnctf_hugme</guid>
+      <pubDate>Sun, 25 Sep 2016 12:26:00 +0800</pubDate>
+    </item>
     <item>
       <title>reversing.kr AutoHotkey2&#xA;</title>
       <link>/articles/reversing_kr_autohotkey2.html</link>

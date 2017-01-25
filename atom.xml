@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom">
   <title>Wxy&#39;s Blog</title>
   <id>http://blog.wangxiyu.me/</id>
-  <updated>2017-01-25T12:08:50+08:00</updated>
+  <updated>2017-01-25T12:24:35+08:00</updated>
   <subtitle>Reversing,Web Backend</subtitle>
   <link href="http://blog.wangxiyu.me/"></link>
   <author>
     <name>Wxy</name>
     <email>wangxiyu191@gmail.com</email>
   </author>
+  <entry>
+    <title>GeekPwnCTF2016 qual HugMe-300&#xA;</title>
+    <updated>2016-09-25T12:26:00+08:00</updated>
+    <id>geekpwnctf_hugme</id>
+    <content type="html"></content>
+    <link href="/articles/geekpwnctf_hugme.html"></link>
+    <author>
+      <name>Wxy</name>
+      <email>wangxiyu191@gmail.com</email>
+    </author>
+  </entry>
   <entry>
     <title>reversing.kr AutoHotkey2&#xA;</title>
     <updated>2016-02-15T22:30:00+08:00</updated>

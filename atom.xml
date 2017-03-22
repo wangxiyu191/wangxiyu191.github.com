@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom">
   <title>Wxy&#39;s Blog</title>
   <id>http://blog.wangxiyu.me/</id>
-  <updated>2017-01-25T12:24:35+08:00</updated>
+  <updated>2017-03-22T13:22:28+08:00</updated>
   <subtitle>Reversing,Web Backend</subtitle>
   <link href="http://blog.wangxiyu.me/"></link>
   <author>
@@ -9,44 +9,55 @@
     <email>wangxiyu191@gmail.com</email>
   </author>
   <entry>
-    <title>GeekPwnCTF2016 qual HugMe-300&#xA;</title>
+    <title>2016-2017</title>
+    <updated>2017-02-03T00:25:00+08:00</updated>
+    <id>2016</id>
+    <content type="html"></content>
+    <link href="http://blog.wangxiyu.me/articles/2016.html"></link>
+    <author>
+      <name>Wxy</name>
+      <email>wangxiyu191@gmail.com</email>
+    </author>
+  </entry>
+  <entry>
+    <title>GeekPwnCTF2016 qual HugMe-300</title>
     <updated>2016-09-25T12:26:00+08:00</updated>
     <id>geekpwnctf_hugme</id>
     <content type="html"></content>
-    <link href="/articles/geekpwnctf_hugme.html"></link>
+    <link href="http://blog.wangxiyu.me/articles/geekpwnctf_hugme.html"></link>
     <author>
       <name>Wxy</name>
       <email>wangxiyu191@gmail.com</email>
     </author>
   </entry>
   <entry>
-    <title>reversing.kr AutoHotkey2&#xA;</title>
+    <title>reversing.kr AutoHotkey2</title>
     <updated>2016-02-15T22:30:00+08:00</updated>
     <id>reversing_kr_autohotkey2</id>
     <content type="html"></content>
-    <link href="/articles/reversing_kr_autohotkey2.html"></link>
+    <link href="http://blog.wangxiyu.me/articles/reversing_kr_autohotkey2.html"></link>
     <author>
       <name>Wxy</name>
       <email>wangxiyu191@gmail.com</email>
     </author>
   </entry>
   <entry>
-    <title>Wechall SQLI&#xA;</title>
+    <title>Wechall SQLI</title>
     <updated>2015-11-09T12:00:00+08:00</updated>
     <id>wechall_sql</id>
     <content type="html"></content>
-    <link href="/articles/wechall_sql.html"></link>
+    <link href="http://blog.wangxiyu.me/articles/wechall_sql.html"></link>
     <author>
       <name>Wxy</name>
       <email>wangxiyu191@gmail.com</email>
     </author>
   </entry>
   <entry>
-    <title>Hello Blogo&#xA;</title>
+    <title>Hello Blogo</title>
     <updated>2015-10-10T09:42:00+08:00</updated>
     <id>hello_blogo</id>
     <content type="html"></content>
-    <link href="/articles/hello_blogo.html"></link>
+    <link href="http://blog.wangxiyu.me/articles/hello_blogo.html"></link>
     <author>
       <name>Wxy</name>
       <email>wangxiyu191@gmail.com</email>

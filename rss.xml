@@ -4,34 +4,42 @@
     <link>http://blog.wangxiyu.me/</link>
     <description>Reversing,Web Backend</description>
     <managingEditor>wangxiyu191@gmail.com (Wxy)</managingEditor>
-    <pubDate>Wed, 25 Jan 2017 12:24:35 +0800</pubDate>
+    <pubDate>Wed, 22 Mar 2017 13:22:28 +0800</pubDate>
     <item>
-      <title>GeekPwnCTF2016 qual HugMe-300&#xA;</title>
-      <link>/articles/geekpwnctf_hugme.html</link>
+      <title>2016-2017</title>
+      <link>http://blog.wangxiyu.me/articles/2016.html</link>
+      <description></description>
+      <author>Wxy</author>
+      <guid>2016</guid>
+      <pubDate>Fri, 03 Feb 2017 00:25:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>GeekPwnCTF2016 qual HugMe-300</title>
+      <link>http://blog.wangxiyu.me/articles/geekpwnctf_hugme.html</link>
       <description></description>
       <author>Wxy</author>
       <guid>geekpwnctf_hugme</guid>
       <pubDate>Sun, 25 Sep 2016 12:26:00 +0800</pubDate>
     </item>
     <item>
-      <title>reversing.kr AutoHotkey2&#xA;</title>
-      <link>/articles/reversing_kr_autohotkey2.html</link>
+      <title>reversing.kr AutoHotkey2</title>
+      <link>http://blog.wangxiyu.me/articles/reversing_kr_autohotkey2.html</link>
       <description></description>
       <author>Wxy</author>
       <guid>reversing_kr_autohotkey2</guid>
       <pubDate>Mon, 15 Feb 2016 22:30:00 +0800</pubDate>
     </item>
     <item>
-      <title>Wechall SQLI&#xA;</title>
-      <link>/articles/wechall_sql.html</link>
+      <title>Wechall SQLI</title>
+      <link>http://blog.wangxiyu.me/articles/wechall_sql.html</link>
       <description></description>
       <author>Wxy</author>
       <guid>wechall_sql</guid>
       <pubDate>Mon, 09 Nov 2015 12:00:00 +0800</pubDate>
     </item>
     <item>
-      <title>Hello Blogo&#xA;</title>
-      <link>/articles/hello_blogo.html</link>
+      <title>Hello Blogo</title>
+      <link>http://blog.wangxiyu.me/articles/hello_blogo.html</link>
       <description></description>
       <author>Wxy</author>
       <guid>hello_blogo</guid>

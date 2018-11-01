@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom">
   <title>Wxy&#39;s Blog</title>
   <id>http://blog.wangxiyu.me/</id>
-  <updated>2017-03-22T13:31:37+08:00</updated>
+  <updated>2018-11-01T23:18:00+08:00</updated>
   <subtitle>Reversing,Web Backend</subtitle>
   <link href="http://blog.wangxiyu.me/"></link>
   <author>
     <name>Wxy</name>
     <email>wangxiyu191@gmail.com</email>
   </author>
+  <entry>
+    <title>MySQL Replication</title>
+    <updated>2018-11-01T23:01:00+08:00</updated>
+    <id>mysql_replication</id>
+    <content type="html"></content>
+    <link href="http://blog.wangxiyu.me/articles/mysql_replication.html"></link>
+    <author>
+      <name>Wxy</name>
+      <email>wangxiyu191@gmail.com</email>
+    </author>
+  </entry>
   <entry>
     <title>GeekPwnCTF2016 qual HugMe-300</title>
     <updated>2016-09-25T12:26:00+08:00</updated>

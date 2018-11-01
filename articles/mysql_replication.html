@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>MySQL Replication</title>
+		<link rel="stylesheet" href="/static/init.css" type="text/css">
+		<link rel="stylesheet" href="/static/yue.css" type="text/css">
+		<link rel="stylesheet" href="/static/blog.css" type="text/css">
+		<link rel="alternate" href="/rss.xml" type="application/rss+xml"/>
+		<link rel="alternate" href="/atom.xml" type="application/atom+xml"/>
+	</head>
+	<body>
+		<div id="page">
+			<main class="yue">
+			<article>
+				<h1 class="title"><a href="http://blog.wangxiyu.me/articles/mysql_replication.html">MySQL Replication</a></h1>
+				<aside class="time">
+					Posted at
+					<time>2018-11-01 23:01:00</time>
+				</aside>
+				<section class="post-content">
+					<p>因为工作原因了解了一下MySQL Replication（复制）相关的内容，然后感觉好久没写博客了，所以有了这一篇博客。说是了解了一下，但是其实也没看多久，所以如果发现错误欢迎指出～</p>
+
+<h2>基本概念：</h2>
+
+<ol>
+<li>Binlog：MySQL 层面的log，常用于同步，审计等等。Binlog中的基本单位为Event，有几种形态：<br />
+
+<ol>
+<li>Statement Based：记录SQL语句<br /></li>
+<li>Row Based：记录对表中行的修改<br /></li>
+<li>Mix：优先使用Statement Based，对于Statement Based不支持的语句，使用Row Based。<br /></li>
+</ol></li>
+<li>WAL：存储引擎层面的log，比如Rocksdb中的WAL，InnoDB中的Redolog。<br /></li>
+<li>以上两者间通过XA保证一致性<br /></li>
+<li>Relay Log：Binlog在远端机器上的副本<br /></li>
+<li>位点：当前复制进行到的位置，一般保存在文件或者数据库中。<br />
+<br /></li>
+</ol>
+
+<h2>单机模式</h2>
+
+<p>在单机模式下，以上几个Binlog和WAL的工作流程（从上往下为时间轴）：<br />
+<img src="static/mysql_replication/15410804526545.jpg" alt="" /><br />
+当一个事务完成了Prepare并进入Commit流程后（对应最左侧SQL Commit）<br />
+首先会通知存储引擎层进入Prepare状态。对于Innodb，几乎无需进行任何操作，因为修改已经写入Redolog。对于MyRocks，此时需要将内存中的WriteBatch写入WAL。<br />
+在存储引擎Prepare完成后开始写入Binlog。<br />
+之后依据sync_binlog参数判断是否需要将binlog刷盘。<br />
+而后通知存储引擎Commit该修改。<br />
+最后响应用户。</p>
+
+<p>当发生crash时，大致有以下几种情况：</p>
+
+<ol>
+<li>Engine中已经Commit：<br />
+Binlog中一定有记录，无需处理<br /></li>
+<li>Engine中已经Prepared，Binlog中有记录：<br />
+通知 Engine Commit<br /></li>
+<li>Engine中已经Prepared ，Binlog中没有记录：<br />
+通知 Engine Rollback<br /></li>
+<li>Engine还没Prepare：<br />
+事务还没执行完，通知 Engine Rollback<br />
+<br /></li>
+</ol>
+
+<p>这样在单机条件下就可以保证Binlog和WAL即使在crash后也依旧是一致的。</p>
+
+<h2>复制（replication）</h2>
+
+<h3>结构</h3>
+
+<p><img src="static/mysql_replication/15410826823131.jpg" alt="" /><br />
+首先从节点会通过IO线程向主节点注册自身。并告知主节点，自身希望从Binlog的什么位置开始复制。<br />
+主节点收到从节点的注册后就会拉起一个线程开始向从节点发送数据。<br />
+IO线程接收到主库发来的Events就会放进relay log<br />
+SQL线程负责在从库apply这些relay log</p>
+
+<h3>常见的几种复制模式：</h3>
+
+<h4>异步复制：</h4>
+
+<p><img src="static/mysql_replication/15410812494722.jpg" alt="" /><br />
+与单机模式的区别就是在通知存储引擎Prepare的同时，会推送这个事务给从节点，但并不等待从返回，直接继续。<br />
+在这种模式下，从节点的log可能是与主节点不一致的，如果主节点宕机，则会丢失还未被同步到从节点的事务。</p>
+
+<h4>半同步</h4>
+
+<p>为了尽可能的提高主从切换之后的数据一致性，MySQL还提供了称之为半同步的模式：<br />
+<img src="static/mysql_replication/15410816484631.jpg" alt="" /><br />
+与异步的主要区别是，在通知存储引擎后，必须等待至少一个从节点（新版可以配置至少等待多少个节点完成）已经将发送过去的Event落盘并回复，之后才能给用户发送响应。<br />
+如果超过设定的超时时间还没有从节点反馈，则退化为异步复制。若之后又有从节点注册到主节点上，则恢复半同步复制。<br />
+这样当用户完成一次写请求时，可以保证对应的数据至少已经保存在两个数据库中了。</p>
+
+<p>然而这种流程下依然存在着问题，设想以下这种情况：<br />
+<img src="static/mysql_replication/15410818529418.jpg" alt="" /><br />
+主节点到从节点的网络突然中断，两次发送的enqueue请求均没有到达从节点。而在此时主节点宕机。<br />
+这样会出现两个问题：</p>
+
+<ol>
+<li>主从数据不一致。首先由于主宕机，我们会切换到从节点继续服务。当旧的主节点重新拉起后，会发现该条事务同时出现在Binlog和WAL中，故会通知引擎层Commit该事务。然而该事务在新的主节点（旧的从节点）上并不存在，进而导致旧的主节点无法与新的主节点（旧的从节点）建立同步关系。<br /></li>
+<li>幻读。当存储引擎层Commit后，该事务造成的修改就对读请求可见了，然而主从切换之后，新的主节点（旧的从节点）并没有该条事务的记录。从客户端的视角来看就是之前能读取的数据突然不见了，也就是幻读了。注意主节点宕机时并未Respond该写事务，所以并不是数据丢失。<br />
+<br /></li>
+</ol>
+
+<h4>增强（无损）半同步</h4>
+
+<p>为了解决以上问题MySQL又引入了增强（无损）半同步。<br />
+<img src="static/mysql_replication/15410826165858.jpg" alt="" /><br />
+大致改动就是在存储引擎层Commit之前就要得到从节点的回复，进而解决了以上的问题。</p>
+
+<h4>全同步模式</h4>
+
+<p>国内大部分对于MySQL的改造版基本都引入了全同步模式/强同步模式/最大保护（Max Protection）模式<br />
+与半同步的主要不同是当超时时间内无从节点回复时，不回退至异步模式，而是停止服务，直到有从节点接收到该事务并回复。<br />
+主要用于对一致性要求较高的场景，并常通过使用多个备节点来增加可用性。</p>
+
+<h3>从节点 Crash Safe</h3>
+
+<p>如果从节点发生crash，最直接的问题就是relaylog的位点可能和relaylog不吻合（先写入了relaylog，还没来得及更新位点就崩了）。同理SQL线程执行的位置也有可能和SQL位点不吻合。<br />
+MySQL采取的改进方式也很直接：将位点保存在数据库中，从而构造一个事务，通过事务的原子性来保证位点的更新和相关的操作是原子的。</p>
+
+<p><code>//写累了，以下等有空来补</code></p>
+
+<hr />
+
+<h3>GTID</h3>
+
+<h3>性能优化</h3>
+
+<p>由于半同步模式必须等待从节点返回，所以延迟会比异步模式高。当然“延迟不应该影响吞吐”，所以MySQL为了半同步模式下的吞吐做了很多优化。</p>
+
+<h4>Group Commit</h4>
+
+<h5>并行apply</h5>
+
+<h4>异步传输binlog</h4>
+
+<h3>HA</h3>
+
+<h4>GitHub October 21 Incident</h4>
+
+				</section>
+			</article>
+			<div id="disqus_thread"></div>
+			<script>
+
+			
+
+			
+			var disqus_config = function () {
+			this.page.url = "http:\/\/blog.wangxiyu.me\/articles\/mysql_replication.html";  
+			this.page.identifier = "mysql_replication"; 
+			this.page.title = "MySQL Replication";
+			};
+			
+			(function() { 
+			var d = document, s = d.createElement('script');
+			s.src = 'https://wxy-blog.disqus.com/embed.js';
+			s.setAttribute('data-timestamp', +new Date());
+			(d.head || d.body).appendChild(s);
+			})();
+			</script>
+			<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+			</main>
+			<div id="right">
+				<div id="float">
+					<img id="logo" src="/static/logo.jpg">
+					<p class="name">Wxy's</p>
+					</img>
+					
+					<nav>
+						<ul>
+							<li><a href="/">Home</a></li>
+							<li><a href="/archive.html">Archives</a></li>
+							<li><a href="/links.html">Links</a></li>
+							<li><a href="/about.html">About</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+		<footer id="footer">
+			Powered by Blogo
+		</footer>
+		<link rel="stylesheet" href="//cdn.bootcss.com/highlight.js/9.0.0/styles/default.min.css">
+		<script src="//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+	</body>
+</html>

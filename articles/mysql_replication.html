@@ -70,7 +70,7 @@ Binlog中一定有记录，无需处理<br /></li>
 
 <h3>结构</h3>
 
-<p><img src="static/mysql_replication/15410826823131.jpg" alt="" /><br />
+<p><img src="/static/mysql_replication/15410826823131.jpg" alt="" /><br />
 首先从节点会通过IO线程向主节点注册自身。并告知主节点，自身希望从Binlog的什么位置开始复制。<br />
 主节点收到从节点的注册后就会拉起一个线程开始向从节点发送数据。<br />
 IO线程接收到主库发来的Events就会放进relay log<br />

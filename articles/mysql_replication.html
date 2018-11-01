@@ -42,7 +42,7 @@
 <h2>单机模式</h2>
 
 <p>在单机模式下，以上几个Binlog和WAL的工作流程（从上往下为时间轴）：<br />
-<img src="static/mysql_replication/15410804526545.jpg" alt="" /><br />
+<img src="/static/mysql_replication/15410804526545.jpg" alt="" /><br />
 当一个事务完成了Prepare并进入Commit流程后（对应最左侧SQL Commit）<br />
 首先会通知存储引擎层进入Prepare状态。对于Innodb，几乎无需进行任何操作，因为修改已经写入Redolog。对于MyRocks，此时需要将内存中的WriteBatch写入WAL。<br />
 在存储引擎Prepare完成后开始写入Binlog。<br />
@@ -80,20 +80,20 @@ SQL线程负责在从库apply这些relay log</p>
 
 <h4>异步复制：</h4>
 
-<p><img src="static/mysql_replication/15410812494722.jpg" alt="" /><br />
+<p><img src="/static/mysql_replication/15410812494722.jpg" alt="" /><br />
 与单机模式的区别就是在通知存储引擎Prepare的同时，会推送这个事务给从节点，但并不等待从返回，直接继续。<br />
 在这种模式下，从节点的log可能是与主节点不一致的，如果主节点宕机，则会丢失还未被同步到从节点的事务。</p>
 
 <h4>半同步</h4>
 
 <p>为了尽可能的提高主从切换之后的数据一致性，MySQL还提供了称之为半同步的模式：<br />
-<img src="static/mysql_replication/15410816484631.jpg" alt="" /><br />
+<img src="/static/mysql_replication/15410816484631.jpg" alt="" /><br />
 与异步的主要区别是，在通知存储引擎后，必须等待至少一个从节点（新版可以配置至少等待多少个节点完成）已经将发送过去的Event落盘并回复，之后才能给用户发送响应。<br />
 如果超过设定的超时时间还没有从节点反馈，则退化为异步复制。若之后又有从节点注册到主节点上，则恢复半同步复制。<br />
 这样当用户完成一次写请求时，可以保证对应的数据至少已经保存在两个数据库中了。</p>
 
 <p>然而这种流程下依然存在着问题，设想以下这种情况：<br />
-<img src="static/mysql_replication/15410818529418.jpg" alt="" /><br />
+<img src="/static/mysql_replication/15410818529418.jpg" alt="" /><br />
 主节点到从节点的网络突然中断，两次发送的enqueue请求均没有到达从节点。而在此时主节点宕机。<br />
 这样会出现两个问题：</p>
 
@@ -106,7 +106,7 @@ SQL线程负责在从库apply这些relay log</p>
 <h4>增强（无损）半同步</h4>
 
 <p>为了解决以上问题MySQL又引入了增强（无损）半同步。<br />
-<img src="static/mysql_replication/15410826165858.jpg" alt="" /><br />
+<img src="/static/mysql_replication/15410826165858.jpg" alt="" /><br />
 大致改动就是在存储引擎层Commit之前就要得到从节点的回复，进而解决了以上的问题。</p>
 
 <h4>全同步模式</h4>

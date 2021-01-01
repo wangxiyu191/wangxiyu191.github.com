@@ -4,7 +4,15 @@
     <link>http://blog.wangxiyu.me/</link>
     <description>Reversing,Web Backend</description>
     <managingEditor>wangxiyu191@gmail.com (Wxy)</managingEditor>
-    <pubDate>Thu, 01 Nov 2018 23:27:35 +0800</pubDate>
+    <pubDate>Fri, 01 Jan 2021 13:00:33 +0800</pubDate>
+    <item>
+      <title>2020总结</title>
+      <link>http://blog.wangxiyu.me/articles/2021-01-01.html</link>
+      <description></description>
+      <author>Wxy</author>
+      <guid>2021-01-01</guid>
+      <pubDate>Fri, 01 Jan 2021 01:00:00 +0800</pubDate>
+    </item>
     <item>
       <title>MySQL Replication</title>
       <link>http://blog.wangxiyu.me/articles/mysql_replication.html</link>
